@@ -436,9 +436,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f31a0a769a462ca4a99c5fdc18e16a7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  computeShader: {fileID: 0}
+  computeShader: {fileID: 7200000, guid: 9231f89f8a9f93b4999a0b911bb5f435, type: 3}
   valor: 0
   arrayFloats: []
   count: 32
   model: {fileID: 2545509758671605985, guid: 1e7ecfeb9fa40f647a41a434f4922339, type: 3}
   chao: {fileID: 1820589813}
+  posY: 0
+  velocidadeInicial: 0
+  gravidade: 9.8
+  velocidadeFinal: 0
+  distancia: 0
+  posicao: 0
+  cair: 0
+  coloriu: 0
+  iniciarGPU: 0
+  tamanhoAlocado: 0
+  time1: 0
+  time2: 0
