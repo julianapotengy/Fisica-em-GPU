@@ -23,6 +23,8 @@ public class Cubos : MonoBehaviour
         public float posA;
     };
 
+    public int iteraction;
+
     GameObject[] gameObjects;
     public int count = 10;
     Cubo[] dado;
@@ -47,9 +49,13 @@ public class Cubos : MonoBehaviour
     public float time1;
     public float time2;
 
+    public float tempo1;
+    public float tempo2;
+    public bool temporizar;
+
     private void Start()
     {
-        
+        temporizar = true;
     }
 
     private void Update()
@@ -71,12 +77,14 @@ public class Cubos : MonoBehaviour
             if (GUI.Button(new Rect(10, 10, 100, 50), "Teste CPU"))
             {
                 CriarCuboCPU();
+                tempo1 = Time.realtimeSinceStartup;
             }
             if (GUI.Button(new Rect(10, 70, 100, 50), "Teste GPU"))
             {
                 time1 = Time.time;
                 time2 = Time.time;
                 CriarCuboGPU();
+                tempo1 = Time.realtimeSinceStartup;
             }
         }
     }
@@ -113,6 +121,7 @@ public class Cubos : MonoBehaviour
             else
             {
                 Colorir();
+                Temporizador();
             }
         }
 
@@ -141,9 +150,11 @@ public class Cubos : MonoBehaviour
         {
             float offsetX = (-count / 2 + i);
 
+            Color _colorInic = Random.ColorHSV(); 
             gameObjects[i] = GameObject.Instantiate(model, new Vector3(offsetX * 1.2f, 0, 0), Quaternion.identity);
 
             dado[i].positionXYZ.y = gameObjects[i].transform.position.y;
+            dado[i].cor = _colorInic;
         }
 
         tamanhoAlocado = sizeof(float) * 3 + sizeof(float) * 6 + sizeof(float) * 4;
@@ -164,6 +175,8 @@ public class Cubos : MonoBehaviour
             //Debug.Log(tamanhoAlocado);
             computebuffer = new ComputeBuffer(count, tamanhoAlocado);
             computebuffer.SetData(dado);
+            computeShader.SetInt("iteraction", iteraction);
+            computeShader.SetInt("nCubos", dado.Length);
             computeShader.SetBuffer(kernel, "cubos", computebuffer);
             computeShader.Dispatch(kernel, Mathf.CeilToInt(dado.Length / 16), 1, 1);
             computebuffer.GetData(dado);
@@ -186,6 +199,8 @@ public class Cubos : MonoBehaviour
         {
             computebuffer = new ComputeBuffer(count, tamanhoAlocado);
             computebuffer.SetData(dado);
+            computeShader.SetInt("iteraction", iteraction);
+            computeShader.SetInt("nCubos", dado.Length);
             computeShader.SetBuffer(kernel, "cubos", computebuffer);
             computeShader.Dispatch(kernel, Mathf.CeilToInt(dado.Length / 16), 1, 1);
             computebuffer.GetData(dado);
@@ -195,7 +210,18 @@ public class Cubos : MonoBehaviour
                 gameObjects[i].GetComponent<MeshRenderer>().material.SetColor("_Color", dado[i].cor);
             }
             coloriu = true;
+            Temporizador();
             computebuffer.Dispose();
+        }
+    }
+
+    public void Temporizador()
+    {
+        if (temporizar)
+        {
+            tempo2 = Time.realtimeSinceStartup;
+            print("Tempo Total = " + tempo2 + " / " + "Diferença de Tempo = " + (tempo2 - tempo1));
+            temporizar = false;
         }
     }
 }
