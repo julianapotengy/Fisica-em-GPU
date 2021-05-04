@@ -21,6 +21,17 @@ public class Cubos : MonoBehaviour
     public GameObject model;
     public GameObject chao;
 
+    public float posY;
+    public float velocidadeInicial = 0;
+    public float gravidade = 9.8f;
+
+    public float velocidadeFinal;
+    public float distancia;
+    public float posicao;
+
+    public bool cair = false;
+    public bool coloriu = false;
+
     private void Start()
     {
         
@@ -28,7 +39,10 @@ public class Cubos : MonoBehaviour
 
     private void Update()
     {
-        
+        if (cair)
+        {
+            PodeCair();
+        }
     }
 
     void OnGUI()
@@ -54,6 +68,42 @@ public class Cubos : MonoBehaviour
             gameObjects[i] = GameObject.Instantiate(model, new Vector3(offsetX * 1.2f, 0, 0), Quaternion.identity);
 
             dado[i].positionXYZ.y = gameObjects[i].transform.position.y;
+        }
+
+        cair = true;
+    }
+
+    public void PodeCair()
+    {
+        velocidadeFinal = velocidadeInicial + gravidade * Time.deltaTime;
+        distancia = ((velocidadeInicial + velocidadeFinal) * Time.deltaTime) / 2;
+        posicao = posY - distancia;
+
+        for (int i = 0; i < count; i++)
+        {
+            if (gameObjects[i].transform.position.y > chao.transform.position.y + 1)
+            {
+                gameObjects[i].transform.position += new Vector3(this.transform.position.x, posicao, this.transform.position.z);
+            }
+            else
+            {
+                Colorir();
+            }
+        }
+
+        velocidadeInicial = velocidadeFinal;
+        posY = transform.position.y;
+    }
+
+    public void Colorir()
+    {
+        if (!coloriu)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                gameObjects[i].GetComponent<MeshRenderer>().material.SetColor("_Color", Random.ColorHSV());
+            }
+            coloriu = true;
         }
     }
 }
