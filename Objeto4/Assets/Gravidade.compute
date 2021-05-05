@@ -14,6 +14,8 @@ struct Cubo
 };
 
 RWStructuredBuffer<Cubo> cubos;
+int iteraction;
+int nCubos;
 
 float rand(float2 co) {
     return (frac(sin(dot(co.xy, float2(12.9898, 78233))) * 43758.5453)) * 1;
@@ -22,20 +24,26 @@ float rand(float2 co) {
 [numthreads(16,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    Cubo cubo = cubos[id.x];
+    if (id.x < nCubos)
+    {
+        Cubo cubo = cubos[id.x];
 
-    //código
-    cubo.velocidadeF = cubo.velocidadeI + 9.8f * cubo.deltaTime;
-    cubo.posI = cubo.posA + ((cubo.velocidadeF + cubo.velocidadeI) * cubo.deltaTime) / 2;
+        //código
+        cubo.velocidadeF = cubo.velocidadeI + 9.8f * cubo.deltaTime;
+        cubo.posI = cubo.posA + ((cubo.velocidadeF + cubo.velocidadeI) * cubo.deltaTime) / 2;
 
-    float _r = rand(float2(cubo.cor.r, cubo.cor.g));
-    float _g = rand(float2(cubo.cor.g, cubo.cor.b));
-    float _b = rand(float2(cubo.cor.r, cubo.cor.b));
+        for (int i = 0; i < iteraction; i++)
+        {
+            float _r = rand(float2(cubo.cor.r, cubo.cor.g));
+            float _g = rand(float2(cubo.cor.g, cubo.cor.b));
+            float _b = rand(float2(cubo.cor.r, cubo.cor.b));
 
-    cubo.cor = float4(_r, _g, _b, 1);
+            cubo.cor = float4(_r, _g, _b, 1);
+        }
 
-    cubo.velocidadeI = cubo.velocidadeF;
-    cubo.posA = cubo.posI;
+        cubo.velocidadeI = cubo.velocidadeF;
+        cubo.posA = cubo.posI;
 
-    cubos[id.x] = cubo;
+        cubos[id.x] = cubo;
+    }
 }
